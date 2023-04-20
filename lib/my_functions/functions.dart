@@ -1,6 +1,7 @@
 import 'package:vocsy_epub_viewer/epub_viewer.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
-import 'dart:convert';
+import 'dart:convert'; // it for jsonDecode
+import 'package:google_fonts/google_fonts.dart';
 
 //my files
 import 'package:flutter_one_epub/models/book.dart';
@@ -31,7 +32,7 @@ openEpub(int bookid) async {
       SessionManager().set("$bookid", book);      
     });
 
-    await VocsyEpub.openAsset('assets/javascript.epub',
+    await VocsyEpub.openAsset('assets/book/javascript.epub',
       lastLocation: EpubLocator.fromJson({
         "bookId": book!.bookId,
         "href": book!.href,
