@@ -1,0 +1,103 @@
+import 'package:sqflite/sqflite.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_one_epub/models/book_from_sql.dart';
+
+class DatabaseHelper {
+
+  static DatabaseHelper? _databaseHelper; //Singleton DatabaseHelper
+  static Database? _database;
+
+  String bookTable = 'book_table';
+  String colId = 'id';
+  String colBookId = 'book_id';
+  String colBookName = 'book_name';
+  String colBookTitle = 'book_title';
+  String colBookUrl = 'book_url';
+  String colBase64 = 'base64';
+
+
+  DatabaseHelper._createInstance(); //Named constructor to create instance of DatabaseHelper
+
+  factory DatabaseHelper() {
+
+    if(_databaseHelper == null) {
+      _databaseHelper = DatabaseHelper._createInstance(); //This is executed only once, singleton object
+    }
+    return _databaseHelper!;
+  } 
+
+  Future<Database> get database async {
+    if(_database == null){
+      _database = await initializeDatabase();
+    }
+    return _database!;
+  }
+
+  Future<Database> initializeDatabase() async {
+    // Get the directory path for both Android and iOS to store database.
+    Directory directory = await getApplicationDocumentsDirectory(); 
+    String path = directory.path + 'books.db';
+
+    // Open/create the database at a given path
+    var booksDatabase = await openDatabase(path, version: 1, onCreate: _createDb);
+    return booksDatabase;
+
+  }
+
+  void _createDb(Database db, int newVersion) async {
+    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64 )');
+  }
+
+  // Fetch Operation: Get All book object from database
+  Future<List<Map<String, dynamic>>> getBookMapList() async {
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $bookTable ORDER BY $colId ASC');
+    return result;
+  }
+
+  // Insert Operation: Insert a book object to database
+  Future<int> insertBook(BookFromSql bookFromSql) async {
+    Database db = await this.database;
+    int result = await db.insert(bookTable, bookFromSql.toMap());
+    return result;
+  }
+
+  // Update Peration: Update a Book object from database
+  Future<int> updateBook(BookFromSql bookFromSql) async {
+    Database db = await this.database;
+    var result = await db.update(bookTable, bookFromSql.toMap(), where: '$colBookId = ?', whereArgs: [bookFromSql.book_id]);
+    return result;
+  }
+
+  // Delete Operation: a Note object from database
+  Future<int> deleteBook(int bookId) async {
+    var db = await this.database;
+    int result = await db.rawDelete('DELETE FROM $bookTable WHERE $colBookId = $bookId');
+    return result;
+  }
+
+  // Get number of Book objects in database
+  Future<int> getCount() async {
+    Database db = await this.database;
+    List<Map<String, dynamic>> x = await db.rawQuery('SELECT COUNT(*) FROM $bookTable');
+    int? result = Sqflite.firstIntValue(x);
+    return result!;
+  }
+
+  // Get the 'Map List' [List<Map>] and convert it to 'Book list' [List<Book>]
+  Future<List<BookFromSql>> getBookList() async {
+    var bookMapList = await getBookMapList();
+    int count = bookMapList.length;
+
+    List<BookFromSql> bookList = <BookFromSql>[];
+
+    // Loop to create a 'Note List' from a 'Map List'
+    for(int i=0; i<count; i++){
+      bookList.add(BookFromSql.fromMapObject(bookMapList[i]));
+    } 
+    return bookList;
+
+  }
+}

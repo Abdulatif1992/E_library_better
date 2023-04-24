@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 //my files
 import 'package:flutter_one_epub/models/book.dart';
 
-openEpub(int bookid) async {
+openEpub(int bookid, String bookUrl) async {
   EpubBook? book;
     bool checker = await SessionManager().containsKey("$bookid");
     if(checker)
@@ -32,7 +32,7 @@ openEpub(int bookid) async {
       SessionManager().set("$bookid", book);      
     });
 
-    await VocsyEpub.openAsset('assets/book/javascript.epub',
+    await VocsyEpub.openAsset(bookUrl,
       lastLocation: EpubLocator.fromJson({
         "bookId": book!.bookId,
         "href": book!.href,

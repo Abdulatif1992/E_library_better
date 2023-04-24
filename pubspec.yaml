@@ -38,6 +38,10 @@ dependencies:
   vocsy_epub_viewer: ^2.0.0
   flutter_session_manager: ^1.0.3
   google_fonts: ^4.0.3
+  sqflite: any
+  path_provider: any
+  intl: ^0.18.1
+
 
 dev_dependencies:
   flutter_test:
