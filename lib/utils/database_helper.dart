@@ -16,6 +16,7 @@ class DatabaseHelper {
   String colBookTitle = 'book_title';
   String colBookUrl = 'book_url';
   String colBase64 = 'base64';
+  String colUpdate = 'upd';
 
 
   DatabaseHelper._createInstance(); //Named constructor to create instance of DatabaseHelper
@@ -47,13 +48,20 @@ class DatabaseHelper {
   }
 
   void _createDb(Database db, int newVersion) async {
-    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64 )');
+    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64, $colUpdate INTEGER )');
   }
 
   // Fetch Operation: Get All book object from database
   Future<List<Map<String, dynamic>>> getBookMapList() async {
     Database db = await this.database;
     var result = await db.rawQuery('SELECT * FROM $bookTable ORDER BY $colId ASC');
+    return result;
+  }
+
+  // Fetch Operation: Get only downloaded book objects from database
+  Future<List<Map<String, dynamic>>> getSpecialBookMapList() async {
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $bookTable WHERE $colUpdate = 1 ORDER BY $colId ASC');
     return result;
   }
 
@@ -68,6 +76,18 @@ class DatabaseHelper {
   Future<int> updateBook(BookFromSql bookFromSql) async {
     Database db = await this.database;
     var result = await db.update(bookTable, bookFromSql.toMap(), where: '$colBookId = ?', whereArgs: [bookFromSql.book_id]);
+    return result;
+  }
+
+  // Update only upd cloumn
+  Future<int> updateBookUpd(int book_id) async {
+    Database db = await this.database;
+    var result = await db.rawUpdate('''
+      UPDATE $bookTable 
+      SET $colUpdate = ? 
+      WHERE $colBookId = ?
+      ''', 
+      [1, book_id]);
     return result;
   }
 
@@ -89,6 +109,21 @@ class DatabaseHelper {
   // Get the 'Map List' [List<Map>] and convert it to 'Book list' [List<Book>]
   Future<List<BookFromSql>> getBookList() async {
     var bookMapList = await getBookMapList();
+    int count = bookMapList.length;
+
+    List<BookFromSql> bookList = <BookFromSql>[];
+
+    // Loop to create a 'Note List' from a 'Map List'
+    for(int i=0; i<count; i++){
+      bookList.add(BookFromSql.fromMapObject(bookMapList[i]));
+    } 
+    return bookList;
+
+  }
+
+  // Get the 'Map List' [List<Map>] and convert it to 'Book list' [List<Book>]
+  Future<List<BookFromSql>> getBookListDowloaded() async {
+    var bookMapList = await getSpecialBookMapList();
     int count = bookMapList.length;
 
     List<BookFromSql> bookList = <BookFromSql>[];

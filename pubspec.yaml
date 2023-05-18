@@ -41,7 +41,11 @@ dependencies:
   sqflite: any
   path_provider: any
   intl: ^0.18.1
-
+  tuple: ^2.0.1
+  http: ^0.13.5
+  internet_connection_checker: ^1.0.0+1
+  archive: ^3.3.5
+  animated_icon: ^0.0.5
 
 dev_dependencies:
   flutter_test:

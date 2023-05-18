@@ -4,14 +4,16 @@ class BookFromSql{
   String? _book_title;
   String? _book_url;
   String? _base64;
+  int? _upd;
 
-  BookFromSql(this._book_id, this._book_name, this._book_title, this._book_url, this._base64);
+  BookFromSql(this._book_id, this._book_name, this._book_title, this._book_url, this._base64, this._upd);
 
   int get book_id => _book_id!;
   String get book_name => _book_name!;
   String get book_title => _book_title!;
   String get book_url =>_book_url!;
   String get base64 => _base64!;  
+  int get upd => _upd!;  
 
   // Convert a BookFromSql object into a Map object
   // becouse SqlLite database works with Map object
@@ -23,6 +25,7 @@ class BookFromSql{
     map['book_title'] = _book_title;
     map['book_url'] = _book_url;
     map['base64'] = _base64;
+    map['upd'] = _upd;
 
     return map;
   }
@@ -34,6 +37,7 @@ class BookFromSql{
     this._book_title = map['book_title'];
     this._book_url = map['book_url'];
     this._base64 = map['base64'];
+    this._upd = map['upd'];
   }
 
 }
