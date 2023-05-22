@@ -15,37 +15,67 @@ import 'dart:io';
 //it is for zip
 import 'package:archive/archive.dart';
 
-unzipEpub(int bookid) async{
-  String _dir = (await getApplicationDocumentsDirectory()).path;
+class EpubReaderScreen extends StatefulWidget {
+  const EpubReaderScreen({super.key, required this.book_id});
 
-  String book_url = "$_dir/$bookid.zip";
-  if(await File(book_url).exists()==true)
-  {
-    // Read the Zip file from disk.
-    var bytes = File("$_dir/$bookid.zip").readAsBytesSync();
+  final int book_id;
 
-    // Decode the Zip file
-    final archive = ZipDecoder().decodeBytes(bytes);
-
-    // Extract the contents of the Zip archive to disk.
-    for (var file in archive) {
-      var fileName = '$_dir/$bookid.epub';
-      if (file.isFile) {
-        var outFile = File(fileName);
-        print('File::' + outFile.path);
-        //_tempImages.add(outFile.path);
-        outFile = await outFile.create(recursive: true);
-        await outFile.writeAsBytes(file.content);
-      }
-    }
-    await  openEpub(bookid);
-  }
-  else{
-    print("zip file is not exist");
-  }
+  @override
+  State<EpubReaderScreen> createState() => _EpubReaderScreenState();
 }
 
-openEpub(int bookid) async {
+class _EpubReaderScreenState extends State<EpubReaderScreen> {
+  @override
+  void initState(){   
+    unzipEpub(widget.book_id);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+
+      ),
+    );
+  }
+
+  Future<void> extractZip() async{
+    print("galdi");
+    print(widget.book_id);
+  }
+
+  Future<void>unzipEpub(int bookid) async{
+    String _dir = (await getApplicationDocumentsDirectory()).path;
+
+    String book_url = "$_dir/$bookid.zip";
+    if(await File(book_url).exists()==true)
+    {
+      // Read the Zip file from disk.
+      var bytes = File("$_dir/$bookid.zip").readAsBytesSync();
+
+      // Decode the Zip file
+      final archive = ZipDecoder().decodeBytes(bytes);
+
+      // Extract the contents of the Zip archive to disk.
+      for (var file in archive) {
+        var fileName = '$_dir/$bookid.epub';
+        if (file.isFile) {
+          var outFile = File(fileName);
+          print('File::' + outFile.path);
+          //_tempImages.add(outFile.path);
+          outFile = await outFile.create(recursive: true);
+          await outFile.writeAsBytes(file.content);
+        }
+      }
+      await  openEpub(bookid);
+    }
+    else{
+      print("zip file is not exist");
+    }
+  }
+
+  openEpub(int bookid) async {
     EpubBook? book;
     String _dir = (await getApplicationDocumentsDirectory()).path;
     String book_Url = "$_dir/$bookid.epub";
@@ -58,12 +88,12 @@ openEpub(int bookid) async {
     
 
     VocsyEpub.setConfig(
-           //themeColor: Theme.of(context).primaryColor,
-           identifier: "iosBook",
-           scrollDirection: EpubScrollDirection.ALLDIRECTIONS,
-           allowSharing: true,
-           enableTts: true,
-           //nightMode: true,
+          //themeColor: Theme.of(context).primaryColor,
+          identifier: "iosBook",
+          scrollDirection: EpubScrollDirection.ALLDIRECTIONS,
+          allowSharing: true,
+          enableTts: true,
+          //nightMode: true,
     );
 
     VocsyEpub.locatorStream.listen((locator) async {
@@ -74,6 +104,10 @@ openEpub(int bookid) async {
       await SessionManager().set("$bookid", book);   
       int timestamp = DateTime.now().millisecondsSinceEpoch;   
       await DatabaseHelper().updateBookDtime(bookid, timestamp);
+      await Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => HomeScrenn()),
+          );
     });
 
     VocsyEpub.open(
@@ -88,5 +122,6 @@ openEpub(int bookid) async {
         }), // first page will open up if the value is null
     );   
 
-}
+  } 
 
+}

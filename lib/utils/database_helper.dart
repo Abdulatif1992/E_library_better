@@ -17,6 +17,7 @@ class DatabaseHelper {
   String colBookUrl = 'book_url';
   String colBase64 = 'base64';
   String colUpdate = 'upd';
+  String colDtime = 'dtime';
 
 
   DatabaseHelper._createInstance(); //Named constructor to create instance of DatabaseHelper
@@ -48,7 +49,7 @@ class DatabaseHelper {
   }
 
   void _createDb(Database db, int newVersion) async {
-    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64, $colUpdate INTEGER )');
+    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64, $colUpdate INTEGER, $colDtime INTEGER )');
   }
 
   // Fetch Operation: Get All book object from database
@@ -61,7 +62,7 @@ class DatabaseHelper {
   // Fetch Operation: Get only downloaded book objects from database
   Future<List<Map<String, dynamic>>> getSpecialBookMapList() async {
     Database db = await this.database;
-    var result = await db.rawQuery('SELECT * FROM $bookTable WHERE $colUpdate = 1 ORDER BY $colId ASC');
+    var result = await db.rawQuery('SELECT * FROM $bookTable WHERE $colUpdate = 1 ORDER BY $colDtime DESC');
     return result;
   }
 
@@ -88,6 +89,18 @@ class DatabaseHelper {
       WHERE $colBookId = ?
       ''', 
       [1, book_id]);
+    return result;
+  }
+
+  // Update only Dtime cloumn
+  Future<int> updateBookDtime(int book_id, int now) async {
+    Database db = await this.database;
+    var result = await db.rawUpdate('''
+      UPDATE $bookTable 
+      SET $colDtime = ? 
+      WHERE $colBookId = ?
+      ''', 
+      [now, book_id]);
     return result;
   }
 

@@ -11,17 +11,11 @@ import 'package:http/http.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 //my files
-import 'package:flutter_one_epub/my_functions/functions.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/detail_screen.dart';
+import 'package:flutter_one_epub/epubreader_screen.dart';
 
-// it is for getting path
-import 'package:path_provider/path_provider.dart';
-//it is for File
-import 'dart:io';
-//it is for zip
-import 'package:archive/archive.dart';
 
 class HomeScrenn extends StatefulWidget {
   const HomeScrenn({super.key});
@@ -72,7 +66,11 @@ class _HomeScrennState extends State<HomeScrenn> {
                     child: Row(
                       children: bookListDownloaded.map((book) => InkWell(
                         onTap: () {
-                          unzipEpub(book.book_id);
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: book.book_id)),
+                          );
+                          //unzipEpub(book.book_id);
                         },
                         child: _myBooks(book.book_id, book.base64),
                       )).toList(),                   
@@ -81,7 +79,13 @@ class _HomeScrennState extends State<HomeScrenn> {
                 ),
 
                 _titleFromInternet(),
-                ElevatedButton(onPressed: () {}, child: Text("Save")),               
+                ElevatedButton(onPressed: () {
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: 1111)),
+                    );
+
+                }, child: Text("next screen")),               
 
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -284,7 +288,7 @@ class _HomeScrennState extends State<HomeScrenn> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${book.book_name} - ${book.upd}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+            Text("${book.dtime} ${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
             Container(width: screenWidth-200.0, height: 65.0 ,child: Text(book.book_title)),
             TextButton.icon(
               onPressed: () {
@@ -411,8 +415,9 @@ class _HomeScrennState extends State<HomeScrenn> {
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
         Map<String, dynamic> data = await jsonDecode(response.body);
-        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0);
+        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0, timestamp);
         await databaseHelper.insertBook(book);
         await  _getData();
         return true;
@@ -431,8 +436,9 @@ class _HomeScrennState extends State<HomeScrenn> {
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
         Map<String, dynamic> data = await jsonDecode(response.body);
-        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0);
+        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0, timestamp);
         await databaseHelper.updateBook(book);
         await  _getData();
       } 
@@ -441,5 +447,18 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
 
   }
-  
+
+ Future<void> updateTime(int book_id) async {
+  DateTime now = DateTime.now();
+  int timestamp = now.millisecondsSinceEpoch;
+  print(now);
+  print(timestamp);
+  var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  print(date);
+  _getData();
+
+ }
+
+
+
 }

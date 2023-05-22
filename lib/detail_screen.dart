@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 //my files
-import 'package:flutter_one_epub/my_functions/functions.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
+import 'package:flutter_one_epub/epubreader_screen.dart';
 
 // animated icon
 import 'package:animated_icon/animated_icon.dart';
@@ -78,7 +78,13 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                         Visibility(
                           visible: isDownloadFinish,
-                          child: ElevatedButton(onPressed: () {unzipEpub(widget.book.book_id);}, child: Text("     Open   ")),
+                          child: ElevatedButton(onPressed: () {
+                            //unzipEpub(widget.book.book_id);
+                            Navigator.push(
+                            context, 
+                            MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
+                          );
+                            }, child: Text("     Open   ")),
                         ),                        
                       ],
                     ),
@@ -183,7 +189,9 @@ class _DetailScreenState extends State<DetailScreen> {
     String book_url = "$_dir/$book_id.zip";
     if(await File(book_url).exists()==true)
     {
+      int timestamp = DateTime.now().millisecondsSinceEpoch;
       await databaseHelper.updateBookUpd(book_id);
+      await databaseHelper.updateBookDtime(book_id, timestamp);
     }
     else{}
   }
@@ -210,5 +218,7 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
-
+  Refresh() async{
+    print("hello");
+  }
 }
