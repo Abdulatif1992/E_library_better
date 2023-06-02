@@ -79,13 +79,7 @@ class _HomeScrennState extends State<HomeScrenn> {
                 ),
 
                 _titleFromInternet(),
-                ElevatedButton(onPressed: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: 1111)),
-                    );
-
-                }, child: Text("next screen")),               
+                ElevatedButton(onPressed: () {getAllBooks([1111]);}, child: Text("next screen")),               
 
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -288,7 +282,7 @@ class _HomeScrennState extends State<HomeScrenn> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${book.dtime} ${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+            Text("${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
             Container(width: screenWidth-200.0, height: 65.0 ,child: Text(book.book_title)),
             TextButton.icon(
               onPressed: () {
@@ -388,17 +382,17 @@ class _HomeScrennState extends State<HomeScrenn> {
       var booksId = await getBooksId();
       if (booksId.item2 == null) {
         List oldBooksId = [];
+        List mainBooksId = [0];
         for (var i = 0; i < bookList.length; i++) {
           oldBooksId.add(bookList[i].book_id);
         }
         //contains function tells us the list already has the element or not
         for (var i = 0; i < booksId.item1!.length; i++) {
           if (oldBooksId.contains(booksId.item1![i]) == false) {
-            bool check = await getOneBook(booksId.item1![i]);
-            print(
-                'yes we have $i this id = ${booksId.item1![i]} and chck = $check');
+            mainBooksId.add(booksId.item1![i]);
           }
         }
+        bool check = await getAllBooks(mainBooksId);
       } else {
         print(booksId.item2);
       }
@@ -408,17 +402,39 @@ class _HomeScrennState extends State<HomeScrenn> {
   }
 
   //get book from API and save it to sqflite
-  Future<bool> getOneBook(int book_id) async {
+  // Future<bool> getOneBook(int book_id) async {
+  //   try {
+  //     Response response = await post(
+  //             Uri.http('uzfootball.000webhostapp.com', '/api/getbook/$book_id'),
+  //             headers: {"Keep-Alive": "timeout=5, max=1"})
+  //         .timeout(const Duration(seconds: 5));
+  //     if (response.statusCode == 200) {
+  //       int timestamp = DateTime.now().millisecondsSinceEpoch;
+  //       Map<String, dynamic> data = await jsonDecode(response.body);
+  //       BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0, timestamp);
+  //       await databaseHelper.insertBook(book);
+  //       await  _getData();
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     return false;
+  //   }
+  // }
+
+  Future<bool> getAllBooks(List books_id) async {
     try {
       Response response = await post(
-              Uri.http('uzfootball.000webhostapp.com', '/api/getbook/$book_id'),
+              Uri.http('uzfootball.000webhostapp.com', '/api/getbooks/$books_id'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
-        int timestamp = DateTime.now().millisecondsSinceEpoch;
-        Map<String, dynamic> data = await jsonDecode(response.body);
-        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0, timestamp);
-        await databaseHelper.insertBook(book);
+        List<dynamic> books = await jsonDecode(response.body);
+        books.forEach((data) => {
+          databaseHelper.insertBook(BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['status'], data['base64'], 0, DateTime.now().millisecondsSinceEpoch))
+          //databaseHelper.insertBook(BookFromSql(_book_id, _book_name, _book_title, _status, _base64, _upd, _dtime))
+        });
         await  _getData();
         return true;
       } else {
@@ -438,7 +454,7 @@ class _HomeScrennState extends State<HomeScrenn> {
       if (response.statusCode == 200) {
         int timestamp = DateTime.now().millisecondsSinceEpoch;
         Map<String, dynamic> data = await jsonDecode(response.body);
-        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_url'], data['base64'], 0, timestamp);
+        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['status'], data['base64'], 0, timestamp);
         await databaseHelper.updateBook(book);
         await  _getData();
       } 
@@ -448,16 +464,18 @@ class _HomeScrennState extends State<HomeScrenn> {
 
   }
 
- Future<void> updateTime(int book_id) async {
-  DateTime now = DateTime.now();
-  int timestamp = now.millisecondsSinceEpoch;
-  print(now);
-  print(timestamp);
-  var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  print(date);
-  _getData();
+  Future<void> updateTime(int book_id) async {
+    DateTime now = DateTime.now();
+    int timestamp = now.millisecondsSinceEpoch;
+    print(now);
+    print(timestamp);
+    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    print(date);
+    _getData();
 
- }
+  }
+
+  
 
 
 

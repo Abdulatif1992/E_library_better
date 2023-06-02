@@ -40,10 +40,6 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
     );
   }
 
-  Future<void> extractZip() async{
-    print("galdi");
-    print(widget.book_id);
-  }
 
   Future<void>unzipEpub(int bookid) async{
     String _dir = (await getApplicationDocumentsDirectory()).path;
@@ -55,7 +51,11 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
       var bytes = File("$_dir/$bookid.zip").readAsBytesSync();
 
       // Decode the Zip file
-      final archive = ZipDecoder().decodeBytes(bytes);
+      final archive = ZipDecoder().decodeBytes(
+        bytes,
+        verify: true,
+        password: "sazagan_92",
+        );
 
       // Extract the contents of the Zip archive to disk.
       for (var file in archive) {
@@ -104,6 +104,7 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
       await SessionManager().set("$bookid", book);   
       int timestamp = DateTime.now().millisecondsSinceEpoch;   
       await DatabaseHelper().updateBookDtime(bookid, timestamp);
+      await deleteEpub(bookid);
       await Navigator.push(
             context, 
             MaterialPageRoute(builder: (context) => HomeScrenn()),
@@ -122,6 +123,17 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
         }), // first page will open up if the value is null
     );   
 
-  } 
+  }
+
+  Future<void> deleteEpub(int book_id) async{
+
+    String _dir = (await getApplicationDocumentsDirectory()).path;
+
+    String book_url = "$_dir/$book_id.epub";
+    if(await File(book_url).exists()==true)
+    {
+      await File(book_url).delete();
+    }  
+  }   
 
 }

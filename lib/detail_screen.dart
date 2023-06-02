@@ -85,7 +85,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
                           );
                             }, child: Text("     Open   ")),
-                        ),                        
+                        ),                                 
                       ],
                     ),
                   ),
@@ -218,7 +218,5 @@ class _DetailScreenState extends State<DetailScreen> {
     }
   }
 
-  Refresh() async{
-    print("hello");
-  }
+  
 }

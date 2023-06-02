@@ -14,7 +14,7 @@ class DatabaseHelper {
   String colBookId = 'book_id';
   String colBookName = 'book_name';
   String colBookTitle = 'book_title';
-  String colBookUrl = 'book_url';
+  String colStatus = 'status';
   String colBase64 = 'base64';
   String colUpdate = 'upd';
   String colDtime = 'dtime';
@@ -49,7 +49,7 @@ class DatabaseHelper {
   }
 
   void _createDb(Database db, int newVersion) async {
-    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colBookUrl TEXT, $colBase64, $colUpdate INTEGER, $colDtime INTEGER )');
+    await db.execute('CREATE TABLE $bookTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colBookId INTEGER, $colBookName VARCHAR(255), $colBookTitle TEXT, $colStatus INTEGER, $colBase64, $colUpdate INTEGER, $colDtime INTEGER )');
   }
 
   // Fetch Operation: Get All book object from database
