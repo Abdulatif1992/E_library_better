@@ -10,10 +10,15 @@ import 'package:flutter_one_epub/home_screen.dart';
 
 // it is for getting path
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 //it is for File
 import 'dart:io';
 //it is for zip
 import 'package:archive/archive.dart';
+
+
+// it is for pdf books
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class EpubReaderScreen extends StatefulWidget {
   const EpubReaderScreen({super.key, required this.book_id});
@@ -58,8 +63,12 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
         );
 
       // Extract the contents of the Zip archive to disk.
+      String extention = "";
       for (var file in archive) {
-        var fileName = '$_dir/$bookid.epub';
+        String full_name = file.name;
+        extention = full_name.substring(full_name.indexOf('.'));
+
+        var fileName = '$_dir/$bookid$extention';
         if (file.isFile) {
           var outFile = File(fileName);
           print('File::' + outFile.path);
@@ -68,7 +77,15 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
           await outFile.writeAsBytes(file.content);
         }
       }
-      await  openEpub(bookid);
+      if(extention=='.epub')
+      {
+        await  openEpub(bookid);
+      }
+      else
+      {
+        print('hali pdf reader tayyor emas');
+      }
+      
     }
     else{
       print("zip file is not exist");
