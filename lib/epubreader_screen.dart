@@ -7,18 +7,15 @@ import 'dart:convert'; // it for jsonDecode
 import 'package:flutter_one_epub/models/book.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/home_screen.dart';
+import 'package:flutter_one_epub/pdfreader_screen.dart';
 
 // it is for getting path
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 //it is for File
 import 'dart:io';
 //it is for zip
 import 'package:archive/archive.dart';
 
-
-// it is for pdf books
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class EpubReaderScreen extends StatefulWidget {
   const EpubReaderScreen({super.key, required this.book_id});
@@ -64,11 +61,13 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
 
       // Extract the contents of the Zip archive to disk.
       String extention = "";
+      String PdfUrl = "";
       for (var file in archive) {
         String full_name = file.name;
         extention = full_name.substring(full_name.indexOf('.'));
 
         var fileName = '$_dir/$bookid$extention';
+        PdfUrl = fileName;
         if (file.isFile) {
           var outFile = File(fileName);
           print('File::' + outFile.path);
@@ -83,7 +82,13 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
       }
       else
       {
-        print('hali pdf reader tayyor emas');
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
+        await DatabaseHelper().updateBookDtime(bookid, timestamp);
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => PdfReaderScreen(book_id: bookid, pdf_url: PdfUrl)),
+          
+        );
       }
       
     }

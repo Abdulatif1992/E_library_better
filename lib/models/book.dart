@@ -19,3 +19,22 @@ class EpubBook {
     'clf': clf,
   };
 }
+
+class PdfBook {
+  final String? bookId;
+  final String? bookUrl;
+  final int? page;
+
+  PdfBook({this.bookId="", this.bookUrl="", this.page=0});  
+
+  PdfBook.fromJson(Map<String, dynamic> json)
+    : bookId = json['bookId'],
+      bookUrl = json['bookUrl'],
+      page = json['page'];
+
+  Map<String, dynamic> toJson() => {
+    'bookId': bookId,
+    'bookUrl': bookUrl,
+    'page': page,
+  };
+}

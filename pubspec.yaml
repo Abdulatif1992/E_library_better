@@ -46,7 +46,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   archive: ^3.3.5
   animated_icon: ^0.0.5
-  syncfusion_flutter_pdfviewer: ^21.2.10
+  syncfusion_flutter_pdfviewer: ^20.3.52
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_one_epub/category_screen.dart';
+import 'package:flutter_one_epub/models/category_from_sql.dart';
+import 'package:flutter_one_epub/utils/database_helper_category.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -15,6 +18,7 @@ import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/detail_screen.dart';
 import 'package:flutter_one_epub/epubreader_screen.dart';
+import 'package:flutter_one_epub/pdfreader_screen.dart';
 
 
 class HomeScrenn extends StatefulWidget {
@@ -27,8 +31,10 @@ class HomeScrenn extends StatefulWidget {
 class _HomeScrennState extends State<HomeScrenn> {
 
   DatabaseHelper databaseHelper = DatabaseHelper();
+  DatabaseHelperCategory databaseHelperCategory = DatabaseHelperCategory();
   var bookList = List<BookFromSql>.empty();
   var bookListDownloaded = List<BookFromSql>.empty();
+  var categoryList = List<CategoryFromSql>.empty();
   // int count = 0;
   // int countDownloaded = 0;
 
@@ -70,7 +76,6 @@ class _HomeScrennState extends State<HomeScrenn> {
                             context, 
                             MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: book.book_id)),
                           );
-                          //unzipEpub(book.book_id);
                         },
                         child: _myBooks(book.book_id, book.base64),
                       )).toList(),                   
@@ -78,8 +83,32 @@ class _HomeScrennState extends State<HomeScrenn> {
                   ),
                 ),
 
-                _titleFromInternet(),
-                ElevatedButton(onPressed: () {getAllBooks([1111]);}, child: Text("next screen")),               
+                _categoriesTitle(),
+
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  child: Container(
+                    //color: Colors.pink,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(50, 171, 207, 240),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: categoryList.map((category) => InkWell(   
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(builder: (context) => CategoryScreen(cat_id: category.id, cat_name: category.category_name)),
+                          );
+                        },                     
+                        child: _myCategories(category.category_name),
+                      )).toList(),                   
+                    ),
+                  ),
+                ),
+
+                _titleFromInternet(),               
 
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -148,6 +177,56 @@ class _HomeScrennState extends State<HomeScrenn> {
     
   }
 
+  Widget _categoriesTitle(){
+    try {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
+        child: Row(
+          children: [
+            Icon(
+              Icons.article_outlined,
+              color: Colors.blueGrey,
+              size: 26.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Text(
+                'Categories',
+                style: GoogleFonts.roboto(
+                  fontSize: 22.0, fontWeight: FontWeight.normal, color: Colors.blueGrey
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    } on Exception catch (_) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
+        child: Row(
+          children: [
+            Icon(
+              Icons.menu_book,
+              color: Colors.black,
+              size: 36.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Text(
+                'Categories',
+                style: GoogleFonts.roboto(
+                  fontSize: 28.0, fontWeight: FontWeight.bold
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    
+  }
+
   Widget _myBooks(int book_id, String base64){
     try{
       return Container(
@@ -179,6 +258,29 @@ class _HomeScrennState extends State<HomeScrenn> {
         )
       );
     }
+  }
+
+  Widget _myCategories(String cat_name){    
+    return Container(
+      margin: EdgeInsets.all(8),
+      height: 25.0,
+      child: ClipRRect(        
+          borderRadius: BorderRadius.circular(10.0),
+          child: Container(
+            //margin: EdgeInsets.all(2.0),
+            padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+            color: Colors.lightBlue,
+            child: Text(
+              '$cat_name',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w600, // light
+                fontStyle: FontStyle.italic, // italic
+              ),
+            ),
+          ),
+      ),      
+    );
   }
 
   Widget _titleFromInternet(){
@@ -219,7 +321,7 @@ class _HomeScrennState extends State<HomeScrenn> {
           children: [
             _imgBase64(book.book_id ,book.base64),            
             _detail(book),
-            _detailIcon(book.upd),
+            _detailIcon(book.upd, book.book_type),
           ],
         ),
       );
@@ -302,7 +404,7 @@ class _HomeScrennState extends State<HomeScrenn> {
     );
   }
 
-  Widget _detailIcon(int upd){
+  Widget _detailIcon(int upd, String btype){
     if(upd==1){
       return Container(
       width: 30.0,
@@ -312,7 +414,13 @@ class _HomeScrennState extends State<HomeScrenn> {
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
           ),
-      child: Icon(Icons.done_all, color: Colors.green,),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          btype=="pdf"? Text(btype):Text(''),
+          Icon(Icons.done_all, color: Colors.green,),
+        ],
+      ),
     );
     }
     else{
@@ -324,7 +432,13 @@ class _HomeScrennState extends State<HomeScrenn> {
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
           ),
-      child: Icon(Icons.file_download, color: Colors.red,),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          btype=="pdf"? Text(btype):Text(''),
+          Icon(Icons.file_download, color: Colors.red,),
+        ],
+      ),
     );
     }
   }
@@ -352,9 +466,11 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<void> _getData() async {
     bookList = await databaseHelper.getBookList();
     bookListDownloaded = await databaseHelper.getBookListDowloaded();
+    categoryList = await databaseHelperCategory.getCategoryList();
     setState(() {
+      categoryList = categoryList;
       bookList = bookList;
-      bookListDownloaded = bookListDownloaded;
+      bookListDownloaded = bookListDownloaded;      
     });
   }
 
@@ -364,7 +480,7 @@ class _HomeScrennState extends State<HomeScrenn> {
               Uri.http('uzfootball.000webhostapp.com', '/api/booksid'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
-      print(response.statusCode);
+      //print(response.statusCode);
       if (response.statusCode == 200) {
         List booksId = jsonDecode(response.body) as List;
         return Tuple2(booksId, null);
@@ -376,9 +492,36 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
+  Future<bool> getCategories(List catsId) async {
+    try {
+      Response response = await post(
+              Uri.http('uzfootball.000webhostapp.com', '/api/getcategories/$catsId'),
+              headers: {"Keep-Alive": "timeout=5, max=1"})
+          .timeout(const Duration(seconds: 5));
+      //print(response.statusCode);
+      if (response.statusCode == 200) {
+        List<dynamic> categories = await jsonDecode(response.body);
+        categories.forEach((data) => {
+          databaseHelperCategory.insertCategory(CategoryFromSql(data['id'], data['name'])),
+        });
+      return true;  
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> checkInternet() async {
     bool check = await InternetConnectionChecker().hasConnection;
     if (check) {
+      List oldCats = await databaseHelperCategory.getCategoryList();
+      List oldCatsId = [0];
+      for (var i = 0; i < oldCats.length; i++) {
+        oldCatsId.add(oldCats[i].id);
+      }      
+      bool getcategories = await getCategories(oldCatsId);
       var booksId = await getBooksId();
       if (booksId.item2 == null) {
         List oldBooksId = [];
@@ -432,8 +575,8 @@ class _HomeScrennState extends State<HomeScrenn> {
       if (response.statusCode == 200) {
         List<dynamic> books = await jsonDecode(response.body);
         books.forEach((data) => {
-          databaseHelper.insertBook(BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['status'], data['base64'], 0, DateTime.now().millisecondsSinceEpoch))
-          //databaseHelper.insertBook(BookFromSql(_book_id, _book_name, _book_title, _status, _base64, _upd, _dtime))
+          databaseHelper.insertBook(BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_type'], data['cat_id'], data['status'], data['base64'], 0, DateTime.now().millisecondsSinceEpoch))
+          //databaseHelper.insertBook(BookFromSql(_book_id, _book_name, _book_title, _book_type,  _status, _base64, _upd, _dtime))
         });
         await  _getData();
         return true;
@@ -454,7 +597,7 @@ class _HomeScrennState extends State<HomeScrenn> {
       if (response.statusCode == 200) {
         int timestamp = DateTime.now().millisecondsSinceEpoch;
         Map<String, dynamic> data = await jsonDecode(response.body);
-        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['status'], data['base64'], 0, timestamp);
+        BookFromSql book = BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_type'], data['cat_id'], data['status'], data['base64'], 0, timestamp);
         await databaseHelper.updateBook(book);
         await  _getData();
       } 

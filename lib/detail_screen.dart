@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:flutter_one_epub/epubreader_screen.dart';
+import 'package:flutter_one_epub/pdfreader_screen.dart';
 
 // animated icon
 import 'package:animated_icon/animated_icon.dart';
@@ -31,7 +32,7 @@ class _DetailScreenState extends State<DetailScreen> {
   bool isDownloadStarted = false;
   bool isDownloadFinish = false;
 
-   @override
+  @override
   void initState(){
     _checkDownload(widget.book.book_id);
     super.initState();    
@@ -79,12 +80,12 @@ class _DetailScreenState extends State<DetailScreen> {
                         Visibility(
                           visible: isDownloadFinish,
                           child: ElevatedButton(onPressed: () {
-                            //unzipEpub(widget.book.book_id);
                             Navigator.push(
-                            context, 
-                            MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
-                          );
-                            }, child: Text("     Open   ")),
+                                context, 
+                                MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
+                              );                            
+                            }, child: Text("     Open   "),
+                          ),
                         ),                                 
                       ],
                     ),
