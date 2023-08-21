@@ -35,12 +35,13 @@ class _HomeScrennState extends State<HomeScrenn> {
   var bookList = List<BookFromSql>.empty();
   var bookListDownloaded = List<BookFromSql>.empty();
   var categoryList = List<CategoryFromSql>.empty();
-  // int count = 0;
-  // int countDownloaded = 0;
+
+  var _foundBook = List<BookFromSql>.empty();
 
  
   @override
   void initState(){
+    _foundBook = bookList;
     _getData();
     checkInternet();
     super.initState();    
@@ -108,13 +109,23 @@ class _HomeScrennState extends State<HomeScrenn> {
                   ),
                 ),
 
+                TextField(
+                  onChanged: (value) => _runFilter(value),
+                  decoration: InputDecoration(
+                    labelText: 'Search', suffixIcon: Icon(Icons.search)
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                
                 _titleFromInternet(),               
 
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   physics: BouncingScrollPhysics(),
                   child: Column(
-                    children: bookList.map((book) => InkWell(
+                    children: _foundBook.map((book) => InkWell(
                       child: _allBooks(book),
                     )).toList(),
                   ),
@@ -443,18 +454,6 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
-  //save data to database
-  // void _save() async {
-  //   //BookFromSql book = BookFromSql(_book_id, _book_name, _book_title, _book_url, _base64);
-  //   BookFromSql book = BookFromSql(1116, "My check javascripti", "title ham borda", "assets/book/javascript.epub", "blablabla",0);
-  //   int? result; 
-  //   result = await databaseHelper.insertBook(book);
-  //   if(result != 0){
-  //     print('success');
-  //   }
-  //   else{print('problem');}
-
-  // }
 
   void _getCount() async {
     int? result;
@@ -470,7 +469,8 @@ class _HomeScrennState extends State<HomeScrenn> {
     setState(() {
       categoryList = categoryList;
       bookList = bookList;
-      bookListDownloaded = bookListDownloaded;      
+      bookListDownloaded = bookListDownloaded;  
+      _foundBook = bookList;    
     });
   }
 
@@ -610,12 +610,21 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<void> updateTime(int book_id) async {
     DateTime now = DateTime.now();
     int timestamp = now.millisecondsSinceEpoch;
-    print(now);
-    print(timestamp);
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    print(date);
     _getData();
 
+  }
+
+  Future<void> _runFilter(String keyWord) async{
+    var result = List<BookFromSql>.empty();
+    if(keyWord.isEmpty){result = bookList;}
+    else{
+      result = bookList.where((book) => book.book_name.toLowerCase().contains(keyWord.toLowerCase())).toList();
+    }
+    
+    setState(() {
+      _foundBook = result;
+    });
   }
 
   
