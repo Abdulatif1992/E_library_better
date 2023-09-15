@@ -47,6 +47,8 @@ dependencies:
   archive: ^3.3.5
   animated_icon: ^0.0.5
   syncfusion_flutter_pdfviewer: ^20.3.52
+  get: ^4.6.5
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

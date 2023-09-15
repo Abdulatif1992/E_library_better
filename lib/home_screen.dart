@@ -19,6 +19,7 @@ import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/detail_screen.dart';
 import 'package:flutter_one_epub/epubreader_screen.dart';
 import 'package:flutter_one_epub/pdfreader_screen.dart';
+import 'package:flutter_one_epub/constants/constants.dart';
 
 
 class HomeScrenn extends StatefulWidget {
@@ -477,7 +478,7 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<Tuple2<List?, String?>> getBooksId() async {
     try {
       Response response = await post(
-              Uri.http('uzfootball.000webhostapp.com', '/api/booksid'),
+              Uri.parse('${siteUrl}booksid'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       //print(response.statusCode);
@@ -495,7 +496,8 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<bool> getCategories(List catsId) async {
     try {
       Response response = await post(
-              Uri.http('uzfootball.000webhostapp.com', '/api/getcategories/$catsId'),
+              //Uri.http('uzfootball.000webhostapp.com', '/api/getcategories/$catsId'),
+              Uri.parse('${siteUrl}getcategories/$catsId'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       //print(response.statusCode);
@@ -569,7 +571,8 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<bool> getAllBooks(List books_id) async {
     try {
       Response response = await post(
-              Uri.http('uzfootball.000webhostapp.com', '/api/getbooks/$books_id'),
+              //Uri.http('uzfootball.000webhostapp.com', '/api/getbooks/$books_id'),
+              Uri.parse('${siteUrl}getbooks/$books_id'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
@@ -591,7 +594,8 @@ class _HomeScrennState extends State<HomeScrenn> {
   Future<void> updateBook(int book_id) async {
     try{
       Response response = await post(
-              Uri.http('uzfootball.000webhostapp.com', '/api/getbook/$book_id'),
+              //Uri.http('uzfootball.000webhostapp.com', '/api/getbook/$book_id'),
+              Uri.parse('${siteUrl}getbook/$book_id'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {

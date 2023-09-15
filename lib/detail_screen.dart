@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_one_epub/authentication/login_page.dart';
 import 'package:flutter_one_epub/home_screen.dart';
 import 'dart:convert';
 
@@ -10,15 +11,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:flutter_one_epub/epubreader_screen.dart';
-import 'package:flutter_one_epub/pdfreader_screen.dart';
+import 'package:flutter_one_epub/constants/constants.dart';
 
 // animated icon
 import 'package:animated_icon/animated_icon.dart';
 
+// get
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+
 
 
 class DetailScreen extends StatefulWidget {
-  DetailScreen({super.key, required this.book});
+  const DetailScreen({super.key, required this.book});
 
   final BookFromSql book;
 
@@ -31,6 +36,8 @@ class _DetailScreenState extends State<DetailScreen> {
 
   bool isDownloadStarted = false;
   bool isDownloadFinish = false;
+
+  final box = GetStorage();  
 
   @override
   void initState(){
@@ -59,20 +66,20 @@ class _DetailScreenState extends State<DetailScreen> {
                 children: [
                   Center(
                     child: Image.memory(
-                        base64Decode("${widget.book.base64}"),
+                        base64Decode('${widget.book.base64}'),
                         height: 200.0,
                         width: 160.0,   
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(left: 5.0),
+                    margin: const EdgeInsets.only(left: 5.0),
                     width: screenWidth-200.0,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(widget.book.book_name, 
-                        style: TextStyle(fontSize: 22, color: Colors.blueGrey),),
+                        style: const TextStyle(fontSize: 22, color: Colors.blueGrey),),
                         Visibility(
                           visible: !isDownloadFinish,
                           child: _visible()
@@ -84,7 +91,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 context, 
                                 MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
                               );                            
-                            }, child: Text("     Open   "),
+                            }, child: const Text("     Open   "),
                           ),
                         ),                                 
                       ],
@@ -97,18 +104,18 @@ class _DetailScreenState extends State<DetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(top: 20.0),
-                    child: Text("Book Description",
+                    margin: const EdgeInsets.only(top: 20.0),
+                    child: const Text("Book Description",
                       style: TextStyle(fontWeight: FontWeight.bold,
                         fontSize: 22,
                         color: Colors.blue,
                       ),
                     ),
                   ),
-                  Divider(color: Colors.black),
+                  const Divider(color: Colors.black),
                   Container(height: screenHeight*0.5, 
                   child: Text("${widget.book.book_title}",
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),),
                   
                 ],
@@ -143,10 +150,10 @@ class _DetailScreenState extends State<DetailScreen> {
         onPressed: () {
           Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context) => HomeScrenn()),
+            MaterialPageRoute(builder: (context) => const HomeScrenn()),
           );
         },
-        icon: Icon(Icons.arrow_back, color: Colors.blue,),
+        icon: const Icon(Icons.arrow_back, color: Colors.blue,),
       );
     }
     else{
@@ -154,34 +161,84 @@ class _DetailScreenState extends State<DetailScreen> {
           onPressed: () {
             Navigator.pop(
               context, 
-              MaterialPageRoute(builder: (context) => HomeScrenn()),
+              MaterialPageRoute(builder: (context) => const HomeScrenn()),
             );
           },
-          icon: Icon(Icons.arrow_back, color: Colors.blue,),
+          icon: const Icon(Icons.arrow_back, color: Colors.blue,),
         );
     }
   }
 
-  Future<void> _download(int book_id) async {
+  Future<void> _download(int bookId) async {
 
     setState(() {
         isDownloadFinish = false;
-        isDownloadStarted = true;
-      });
-    File file = await downloadFile(
-        'http://uzfootball.000webhostapp.com/api/download/$book_id', '$book_id.zip');
-    print('Fayl yuklandi: ${file.path}');
-    await updateDb(book_id);
-    await _checkDownload(book_id);
+        isDownloadStarted = true;        
+      });  
+    
+    String filePath = await downloadFile(
+        '${siteUrl}download/$bookId', '$bookId.zip');
+
+    if(filePath=='Unauthenticated')
+    {
+      Get.to(() => const LoginPage());
+    }
+    else if(filePath=='Error')
+    {
+      print('something is wrong please try again');
+    }
+    else if(filePath=='This is a paid book')
+    {
+      Get.snackbar(
+          'Error',
+          'This is a paid book',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        isDownloadFinish = false;
+        setState(() {
+          isDownloadFinish = isDownloadFinish;
+        });
+      //print('This is a paid book');
+
+    }
+    else{
+      await updateDb(bookId);
+      await _checkDownload(bookId);
+      print('Fayl yuklandi: $filePath');
+    }
+
+    
+    
   }
 
-  Future<File> downloadFile(String url, String filename) async {     
-    var request = await http.get(Uri.parse(url));
-    var bytes = request.bodyBytes;
-    var dir = await getApplicationDocumentsDirectory();
-    File file = File('${dir.path}/$filename');
-    await file.writeAsBytes(bytes);
-    return file;
+  Future<String> downloadFile(String url, String filename) async {   
+    final token = box.read('token');
+
+    var request = await http.get(
+      Uri.parse(url), 
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        }
+      );
+    // print(request.statusCode);
+    // print(token);
+    if(request.statusCode==200)
+    {
+      var bytes = request.bodyBytes;
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File('${dir.path}/$filename');
+      await file.writeAsBytes(bytes);
+      return file.path;
+    }
+    else{
+      if(json.decode(request.body)['message']=='Unauthenticated.') {return 'Unauthenticated';}
+      else if(json.decode(request.body)['message']=='This is a paid book'){return 'This is a paid book';}
+      else {return 'Error';}
+    }
+    
   }
 
   Future<void> updateDb(int book_id) async{
