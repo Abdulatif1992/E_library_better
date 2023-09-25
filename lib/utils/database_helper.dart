@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
+import 'package:path/path.dart' as p;
 
 class DatabaseHelper {
 
@@ -41,8 +42,11 @@ class DatabaseHelper {
 
   Future<Database> initializeDatabase() async {
     // Get the directory path for both Android and iOS to store database.
-    Directory directory = await getApplicationDocumentsDirectory(); 
-    String path = directory.path + 'books.db';
+    //Directory directory = await getApplicationDocumentsDirectory(); 
+    //String path = directory.path + 'books.db';
+
+    var databasesPath = await getDatabasesPath();
+    String path = p.join(databasesPath, 'books.db');
 
     // Open/create the database at a given path
     var booksDatabase = await openDatabase(path, version: 1, onCreate: _createDb);

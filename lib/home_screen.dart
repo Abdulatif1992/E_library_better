@@ -21,6 +21,8 @@ import 'package:flutter_one_epub/epubreader_screen.dart';
 import 'package:flutter_one_epub/pdfreader_screen.dart';
 import 'package:flutter_one_epub/constants/constants.dart';
 
+import 'package:get/get.dart' as Getto;
+
 
 class HomeScrenn extends StatefulWidget {
   const HomeScrenn({super.key});
@@ -38,7 +40,6 @@ class _HomeScrennState extends State<HomeScrenn> {
   var categoryList = List<CategoryFromSql>.empty();
 
   var _foundBook = List<BookFromSql>.empty();
-
  
   @override
   void initState(){
@@ -55,7 +56,10 @@ class _HomeScrennState extends State<HomeScrenn> {
       home: Scaffold( 
         body: Padding(
           padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 16.0),
-          child: SingleChildScrollView(
+          child: bookList.isEmpty 
+          ? _listIsempty() 
+          : 
+          SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start, 
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,6 +124,25 @@ class _HomeScrennState extends State<HomeScrenn> {
                   height: 20,
                 ),
                 
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                    elevation: 0,
+                  ),
+                  onPressed: () async {
+                    await checkInternet();
+                    AlertDialog alert = AlertDialog(
+                            title: Text("My title"),
+                            content: Text("This is my message."),
+                            actions: [
+                              okButton,
+                            ],
+                          );
+                    }, 
+                  child: Text('Refresh', style: TextStyle(fontSize: 18)),
+                ),                
+
                 _titleFromInternet(),               
 
                 SingleChildScrollView(
@@ -455,6 +478,30 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
+  Widget _listIsempty(){
+    return Column(
+      children: [
+        GestureDetector(
+          child: Center(
+            child: Container(
+              width:  100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Colors.black,
+                image: DecorationImage(
+                  image:AssetImage("assets/img/restart2.jpg"), 
+                  fit:BoxFit.cover
+                ), // button text
+              )
+            ),
+          ),onTap:(){
+          checkInternet();
+          }
+        ),
+      ],
+    );
+  }
 
   void _getCount() async {
     int? result;
@@ -471,7 +518,7 @@ class _HomeScrennState extends State<HomeScrenn> {
       categoryList = categoryList;
       bookList = bookList;
       bookListDownloaded = bookListDownloaded;  
-      _foundBook = bookList;    
+      _foundBook = bookList;  
     });
   }
 
@@ -483,13 +530,14 @@ class _HomeScrennState extends State<HomeScrenn> {
           .timeout(const Duration(seconds: 5));
       //print(response.statusCode);
       if (response.statusCode == 200) {
-        List booksId = jsonDecode(response.body) as List;
+        List booksId = jsonDecode(response.body) as List;        
         return Tuple2(booksId, null);
       } else {
         return Tuple2(null, 'xatolik response');
+        
       }
     } catch (e) {
-      return Tuple2(null, 'xatolik try tuple');
+      return Tuple2(null, 'xatolik try tuple');      
     }
   }
 
@@ -523,8 +571,8 @@ class _HomeScrennState extends State<HomeScrenn> {
       for (var i = 0; i < oldCats.length; i++) {
         oldCatsId.add(oldCats[i].id);
       }      
-      bool getcategories = await getCategories(oldCatsId);
-      var booksId = await getBooksId();
+      bool getcategories = await getCategories(oldCatsId);      
+      var booksId = await getBooksId();      
       if (booksId.item2 == null) {
         List oldBooksId = [];
         List mainBooksId = [0];
@@ -542,9 +590,16 @@ class _HomeScrennState extends State<HomeScrenn> {
         print(booksId.item2);
       }
     } else {
-      print('No Internet');
+      print("no Internet connection");
+      
     }
   }
+
+  // set up the button
+  Widget okButton = TextButton(
+    child: Text("OK"),
+    onPressed: () { },
+  );
 
   //get book from API and save it to sqflite
   // Future<bool> getOneBook(int book_id) async {
@@ -575,18 +630,19 @@ class _HomeScrennState extends State<HomeScrenn> {
               Uri.parse('${siteUrl}getbooks/$books_id'),
               headers: {"Keep-Alive": "timeout=5, max=1"})
           .timeout(const Duration(seconds: 5));
-      if (response.statusCode == 200) {
-        List<dynamic> books = await jsonDecode(response.body);
+      if (response.statusCode == 200) {        
+        List<dynamic> books = await jsonDecode(response.body);        
+        
         books.forEach((data) => {
           databaseHelper.insertBook(BookFromSql(data['book_id'], data['book_name'], data['book_title'], data['book_type'], data['cat_id'], data['status'], data['base64'], 0, DateTime.now().millisecondsSinceEpoch))
           //databaseHelper.insertBook(BookFromSql(_book_id, _book_name, _book_title, _book_type,  _status, _base64, _upd, _dtime))
         });
         await  _getData();
         return true;
-      } else {
+      } else {        
         return false;
       }
-    } catch (e) {
+    }  catch (e) {
       return false;
     }
   }

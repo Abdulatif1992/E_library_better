@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_one_epub/authentication/authentication.dart';
+import 'package:flutter_one_epub/authentication/forgot_password.dart';
 import 'package:flutter_one_epub/authentication/register_page.dart';
 import 'package:flutter_one_epub/authentication/widgets/input_widget.dart';
 import 'package:get/get.dart';
@@ -58,6 +59,13 @@ class _LoginPageState extends State<LoginPage> {
                   Get.to(() => const RegisterPage());
                 }, 
                 child: Text('Register', style: TextStyle(fontSize: 16),),
+              ),
+              const SizedBox(height: 40.0,),
+              TextButton(
+                onPressed: () {
+                  Get.to(() => const ForgotPassword());
+                }, 
+                child: Align(alignment: Alignment.centerLeft, child: Text('forgot password', style: TextStyle(fontSize: 16), textAlign: TextAlign.left)),
               ),
             ],
           ),
