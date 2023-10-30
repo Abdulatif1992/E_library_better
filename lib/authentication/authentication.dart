@@ -143,13 +143,13 @@ class AuthenticationController extends GetxController{
   }
 
   Future login({
-    required String userName,
+    required String email,
     required String password,
   }) async {
     try{
       isLoading.value = true;
       var data = {
-        'username': userName,
+        'email': email,
         'password': password,
       };
 
@@ -161,6 +161,8 @@ class AuthenticationController extends GetxController{
         body: data,
       );
 
+      print(response.statusCode);
+      print(response.body);
       if(response.statusCode ==200){
         isLoading.value = false;
         token.value = json.decode(response.body)['token'];

@@ -21,7 +21,7 @@ import 'package:flutter_one_epub/epubreader_screen.dart';
 import 'package:flutter_one_epub/pdfreader_screen.dart';
 import 'package:flutter_one_epub/constants/constants.dart';
 
-import 'package:get/get.dart' as Getto;
+
 
 
 class HomeScrenn extends StatefulWidget {
@@ -40,6 +40,8 @@ class _HomeScrennState extends State<HomeScrenn> {
   var categoryList = List<CategoryFromSql>.empty();
 
   var _foundBook = List<BookFromSql>.empty();
+
+  bool isloading = false;
  
   @override
   void initState(){
@@ -370,7 +372,7 @@ class _HomeScrennState extends State<HomeScrenn> {
         ),
         child: Row(
           children: [
-            Text("Paka salom")
+            Text("Something is wrong")
           ],
         ),
       );
@@ -420,7 +422,7 @@ class _HomeScrennState extends State<HomeScrenn> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
-            Container(width: screenWidth-200.0, height: 65.0 ,child: Text(book.book_title)),
+            Container(width: screenWidth-200.0, height: 60.0 ,child: Text(book.book_title)),
             TextButton.icon(
               onPressed: () {
                   // Respond to button press
@@ -480,25 +482,42 @@ class _HomeScrennState extends State<HomeScrenn> {
 
   Widget _listIsempty(){
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GestureDetector(
-          child: Center(
-            child: Container(
-              width:  100,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.black,
-                image: DecorationImage(
-                  image:AssetImage("assets/img/restart2.jpg"), 
-                  fit:BoxFit.cover
-                ), // button text
-              )
+        Visibility(
+          visible: !isloading,
+          child: GestureDetector(
+            child: Center(
+              child: Container(
+                //color: Colors.red,
+                width:  100,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: Colors.black,
+                  image: DecorationImage(
+                    image:AssetImage("assets/img/restart2.jpg"), 
+                    fit:BoxFit.cover
+                  ), // button text
+                )
+              ),                
             ),
-          ),onTap:(){
-          checkInternet();
-          }
+            onTap:(){
+            setState(() {
+              isloading = true;
+            });  
+            checkInternet();
+            }
+          ),
         ),
+        Visibility(
+          visible: isloading,
+          child: Center(
+            child: const CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+          )
+          ),
       ],
     );
   }
@@ -590,8 +609,10 @@ class _HomeScrennState extends State<HomeScrenn> {
         print(booksId.item2);
       }
     } else {
-      print("no Internet connection");
-      
+      setState(() {
+        isloading = false;
+      });
+      print("no Internet connection");      
     }
   }
 

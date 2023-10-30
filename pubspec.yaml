@@ -50,6 +50,7 @@ dependencies:
   get: ^4.6.5
   get_storage: ^2.1.1
   path: any
+  #epubviewer2: ^0.0.4
 
 dev_dependencies:
   flutter_test:
