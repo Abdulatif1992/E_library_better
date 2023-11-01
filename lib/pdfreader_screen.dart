@@ -10,15 +10,15 @@ import 'package:flutter_one_epub/home_screen.dart';
 //it is for File
 import 'dart:io';
 //it is for zip
-import 'package:archive/archive.dart';
+//import 'package:archive/archive.dart';
 // it is for getting path
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 
 class PdfReaderScreen extends StatefulWidget {
-  const PdfReaderScreen({super.key, required this.book_id, required this.pdf_url});
+  const PdfReaderScreen({super.key, required this.bookId, required this.pdfUrl});
 
-  final int book_id;
-  final String pdf_url;
+  final int bookId;
+  final String pdfUrl;
 
   @override
   State<PdfReaderScreen> createState() => _PdfReaderScreenState();
@@ -37,7 +37,7 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
   }
 
   void getSession() async {
-    int bookId = widget.book_id;
+    int bookId = widget.bookId;
     dynamic book = await SessionManager().get("$bookId");
     //User u = User.fromJson(await SessionManager().get("user"));
     if (book != null) {
@@ -63,35 +63,35 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
         leading: _appBarBack(context),       
         actions: <Widget>[
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.article_outlined,
               color: Colors.blue,
             ),
             onPressed: () {_pdfViewerKey.currentState?.openBookmarkView();},
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.zoom_in,
               color: Colors.blue,
             ),
             onPressed: () {_pdfViewerController.zoomLevel = 1.2;},
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.keyboard_arrow_up,
               color: Colors.blue,
             ),
             onPressed: () {_pdfViewerController.previousPage();},
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.keyboard_arrow_down,
               color: Colors.blue,
             ),
             onPressed: () {_pdfViewerController.nextPage();},
           ),
           IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.bookmark,
               color: Colors.blue,
             ),
@@ -101,7 +101,7 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
       ),
       body: Container(
         child: SfPdfViewer.file(
-              File(widget.pdf_url),
+              File(widget.pdfUrl),
               pageLayoutMode: PdfPageLayoutMode.single,
               pageSpacing: 0,
               controller: _pdfViewerController,
@@ -114,15 +114,15 @@ class _PdfReaderScreenState extends State<PdfReaderScreen> {
     return IconButton(
       onPressed: () {
         var page = _pdfViewerController.pageNumber;
-        PdfBook book = PdfBook(bookId: '${widget.book_id}',bookUrl: widget.pdf_url, page: page);        
-        SessionManager().set("${widget.book_id}", book);   
+        PdfBook book = PdfBook(bookId: '${widget.bookId}',bookUrl: widget.pdfUrl, page: page);        
+        SessionManager().set("${widget.bookId}", book);   
 
         Navigator.push(
           context, 
-          MaterialPageRoute(builder: (context) => HomeScrenn()),
+          MaterialPageRoute(builder: (context) => const HomeScrenn()),
         );
       },
-      icon: Icon(Icons.arrow_back, color: Colors.blue,),
+      icon: const Icon(Icons.arrow_back, color: Colors.blue,),
     );    
   }
 

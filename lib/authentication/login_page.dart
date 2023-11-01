@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Login page', style: TextStyle(fontSize: 25.0),),
+                const Text('Login page', style: TextStyle(fontSize: 25.0),),
                 const SizedBox(height: 30.0,),
                 InputWidget(hintText: 'Email', controller: _emailController, obscureText: false),
                 const SizedBox(height: 20.0,),
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? const CircularProgressIndicator(
                         color: Colors.white,
                       )
-                    : Text('Login', style: TextStyle(fontSize: 18),);
+                    : const Text('Login', style: TextStyle(fontSize: 18),);
                   }),
                 ),
                 const SizedBox(height: 20.0,),
@@ -59,14 +59,14 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     Get.to(() => const RegisterPage());
                   }, 
-                  child: Text('Register', style: TextStyle(fontSize: 16),),
+                  child: const Text('Register', style: TextStyle(fontSize: 16),),
                 ),
                 const SizedBox(height: 40.0,),
                 TextButton(
                   onPressed: () {
                     Get.to(() => const ForgotPassword());
                   }, 
-                  child: Align(alignment: Alignment.centerLeft, child: Text('forgot password', style: TextStyle(fontSize: 16), textAlign: TextAlign.left)),
+                  child: const Align(alignment: Alignment.centerLeft, child: Text('forgot password', style: TextStyle(fontSize: 16), textAlign: TextAlign.left)),
                 ),
               ],
             ),

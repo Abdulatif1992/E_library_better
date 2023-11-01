@@ -1,7 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:path/path.dart' as p;
 
@@ -161,8 +159,8 @@ class DatabaseHelper {
 
   }
 
-  Future<List<BookFromSql>> getBookListCategoried(int category_id) async {
-    var bookMapList = await getCategoriedBookMapList(category_id);
+  Future<List<BookFromSql>> getBookListCategoried(int categoryId) async {
+    var bookMapList = await getCategoriedBookMapList(categoryId);
     int count = bookMapList.length;
 
     List<BookFromSql> bookList = <BookFromSql>[];

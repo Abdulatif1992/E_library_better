@@ -89,7 +89,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           child: ElevatedButton(onPressed: () {
                             Navigator.push(
                                 context, 
-                                MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: widget.book.book_id)),
+                                MaterialPageRoute(builder: (context) => EpubReaderScreen(bookId: widget.book.book_id)),
                               );                            
                             }, child: const Text("     Open   "),
                           ),
@@ -115,7 +115,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   const Divider(color: Colors.black),
                   Container(height: screenHeight*0.45,
                   //color: Colors.green, 
-                  child: Text("${widget.book.book_title}",
+                  child: Text(widget.book.book_title,
                     style: const TextStyle(fontSize: 16),
                   ),),
                   
@@ -141,7 +141,7 @@ class _DetailScreenState extends State<DetailScreen> {
       );
     }
     else{
-      return ElevatedButton(onPressed: () {_download(widget.book.book_id);}, child: Text("Download"));
+      return ElevatedButton(onPressed: () {_download(widget.book.book_id);}, child: const Text("Download"));
     }
   }
 
@@ -186,7 +186,13 @@ class _DetailScreenState extends State<DetailScreen> {
     }
     else if(filePath=='Error')
     {
-      print('something is wrong please try again');
+      Get.snackbar(
+          'Error',
+          'Something is wrong please try again',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
     }
     else if(filePath=='This is a paid book')
     {
@@ -197,7 +203,7 @@ class _DetailScreenState extends State<DetailScreen> {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        isDownloadFinish = false;
+        isDownloadFinish = true;
         setState(() {
           isDownloadFinish = isDownloadFinish;
         });
@@ -207,7 +213,7 @@ class _DetailScreenState extends State<DetailScreen> {
     else{
       await updateDb(bookId);
       await _checkDownload(bookId);
-      print('Fayl yuklandi: $filePath');
+      //print('Fayl yuklandi: $filePath');
     }
 
     
@@ -242,23 +248,23 @@ class _DetailScreenState extends State<DetailScreen> {
     
   }
 
-  Future<void> updateDb(int book_id) async{
-    String _dir = (await getApplicationDocumentsDirectory()).path;
+  Future<void> updateDb(int bookId) async{
+    String dir = (await getApplicationDocumentsDirectory()).path;
 
-    String book_url = "$_dir/$book_id.zip";
-    if(await File(book_url).exists()==true)
+    String bookUrl = "$dir/$bookId.zip";
+    if(await File(bookUrl).exists()==true)
     {
       int timestamp = DateTime.now().millisecondsSinceEpoch;
-      await databaseHelper.updateBookUpd(book_id);
-      await databaseHelper.updateBookDtime(book_id, timestamp);
+      await databaseHelper.updateBookUpd(bookId);
+      await databaseHelper.updateBookDtime(bookId, timestamp);
     }
     else{}
   }
 
-  Future<void> _checkDownload(int book_id) async{
-    String _dir = (await getApplicationDocumentsDirectory()).path;
+  Future<void> _checkDownload(int bookId) async{
+    String dir = (await getApplicationDocumentsDirectory()).path;
 
-    String book_url = "$_dir/$book_id.zip";
+    String bookUrl = "$dir/$bookId.zip";
 
     if(widget.book.upd==1){
       isDownloadFinish = true;
@@ -266,7 +272,7 @@ class _DetailScreenState extends State<DetailScreen> {
         isDownloadFinish = isDownloadFinish;
       });
     }
-    else if(await File(book_url).exists()==true){
+    else if(await File(bookUrl).exists()==true){
       isDownloadFinish = true;
         setState(() {
           isDownloadFinish = isDownloadFinish;

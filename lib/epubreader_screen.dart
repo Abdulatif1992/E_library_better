@@ -18,9 +18,9 @@ import 'package:archive/archive.dart';
 
 
 class EpubReaderScreen extends StatefulWidget {
-  const EpubReaderScreen({super.key, required this.book_id});
+  const EpubReaderScreen({super.key, required this.bookId});
 
-  final int book_id;
+  final int bookId;
 
   @override
   State<EpubReaderScreen> createState() => _EpubReaderScreenState();
@@ -29,7 +29,7 @@ class EpubReaderScreen extends StatefulWidget {
 class _EpubReaderScreenState extends State<EpubReaderScreen> {
   @override
   void initState(){   
-    unzipEpub(widget.book_id);
+    unzipEpub(widget.bookId);
     super.initState();
   }
 
@@ -44,13 +44,13 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
 
 
   Future<void>unzipEpub(int bookid) async{
-    String _dir = (await getApplicationDocumentsDirectory()).path;
+    String dir = (await getApplicationDocumentsDirectory()).path;
 
-    String book_url = "$_dir/$bookid.zip";
-    if(await File(book_url).exists()==true)
+    String bookUrl = "$dir/$bookid.zip";
+    if(await File(bookUrl).exists()==true)
     {
       // Read the Zip file from disk.
-      var bytes = File("$_dir/$bookid.zip").readAsBytesSync();
+      var bytes = File("$dir/$bookid.zip").readAsBytesSync();
 
       // Decode the Zip file
       final archive = ZipDecoder().decodeBytes(
@@ -61,16 +61,16 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
 
       // Extract the contents of the Zip archive to disk.
       String extention = "";
-      String PdfUrl = "";
+      String pdfUrl = "";
       for (var file in archive) {
-        String full_name = file.name;
-        extention = full_name.substring(full_name.indexOf('.'));
+        String fullName = file.name;
+        extention = fullName.substring(fullName.indexOf('.'));
 
-        var fileName = '$_dir/$bookid$extention';
-        PdfUrl = fileName;
+        var fileName = '$dir/$bookid$extention';
+        pdfUrl = fileName;
         if (file.isFile) {
           var outFile = File(fileName);
-          print('File::' + outFile.path);
+          //print('File::' + outFile.path);
           //_tempImages.add(outFile.path);
           outFile = await outFile.create(recursive: true);
           await outFile.writeAsBytes(file.content);
@@ -86,21 +86,21 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
         await DatabaseHelper().updateBookDtime(bookid, timestamp);
         Navigator.push(
           context, 
-          MaterialPageRoute(builder: (context) => PdfReaderScreen(book_id: bookid, pdf_url: PdfUrl)),
+          MaterialPageRoute(builder: (context) => PdfReaderScreen(bookId: bookid, pdfUrl: pdfUrl)),
           
         );
       }
       
     }
     else{
-      print("zip file is not exist");
+      //print("zip file is not exist");
     }
   }
 
   openEpub(int bookid) async {
     EpubBook? book;
-    String _dir = (await getApplicationDocumentsDirectory()).path;
-    String book_Url = "$_dir/$bookid.epub";
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    String bookUrl = "$dir/$bookid.epub";
     bool checker = await SessionManager().containsKey("$bookid");
     if(checker)
     {
@@ -129,12 +129,12 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
       await deleteEpub(bookid);
       await Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context) => HomeScrenn()),
+            MaterialPageRoute(builder: (context) => const HomeScrenn()),
           );
     });
 
     VocsyEpub.open(
-      book_Url,
+      bookUrl,
       lastLocation: EpubLocator.fromJson({
         "bookId": book!.bookId,
         "href": book!.href,
@@ -147,14 +147,14 @@ class _EpubReaderScreenState extends State<EpubReaderScreen> {
 
   }
 
-  Future<void> deleteEpub(int book_id) async{
+  Future<void> deleteEpub(int bookId) async{
 
-    String _dir = (await getApplicationDocumentsDirectory()).path;
+    String dir = (await getApplicationDocumentsDirectory()).path;
 
-    String book_url = "$_dir/$book_id.epub";
-    if(await File(book_url).exists()==true)
+    String bookUrl = "$dir/$bookId.epub";
+    if(await File(bookUrl).exists()==true)
     {
-      await File(book_url).delete();
+      await File(bookUrl).delete();
     }  
   }   
 

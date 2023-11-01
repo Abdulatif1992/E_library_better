@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 import 'package:vocsy_epub_viewer/epub_viewer.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'dart:convert'; // it for jsonDecode
@@ -6,7 +6,6 @@ import 'dart:convert'; // it for jsonDecode
 //my files
 import 'package:flutter_one_epub/models/book.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
-import 'package:flutter_one_epub/home_screen.dart';
 
 // it is for getting path
 import 'package:path_provider/path_provider.dart';
@@ -16,23 +15,23 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 
 unzipEpub(int bookid) async{
-  String _dir = (await getApplicationDocumentsDirectory()).path;
+  String dir = (await getApplicationDocumentsDirectory()).path;
 
-  String book_url = "$_dir/$bookid.zip";
-  if(await File(book_url).exists()==true)
+  String bookUrl = "$dir/$bookid.zip";
+  if(await File(bookUrl).exists()==true)
   {
     // Read the Zip file from disk.
-    var bytes = File("$_dir/$bookid.zip").readAsBytesSync();
+    var bytes = File("$dir/$bookid.zip").readAsBytesSync();
 
     // Decode the Zip file
     final archive = ZipDecoder().decodeBytes(bytes);
 
     // Extract the contents of the Zip archive to disk.
     for (var file in archive) {
-      var fileName = '$_dir/$bookid.epub';
+      var fileName = '$dir/$bookid.epub';
       if (file.isFile) {
         var outFile = File(fileName);
-        print('File::' + outFile.path);
+        //print('File::' + outFile.path);
         //_tempImages.add(outFile.path);
         outFile = await outFile.create(recursive: true);
         await outFile.writeAsBytes(file.content);
@@ -41,14 +40,14 @@ unzipEpub(int bookid) async{
     await  openEpub(bookid);
   }
   else{
-    print("zip file is not exist");
+    //print("zip file is not exist");
   }
 }
 
 openEpub(int bookid) async {
     EpubBook? book;
-    String _dir = (await getApplicationDocumentsDirectory()).path;
-    String book_Url = "$_dir/$bookid.epub";
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    String bookUrl = "$dir/$bookid.epub";
     bool checker = await SessionManager().containsKey("$bookid");
     if(checker)
     {
@@ -77,7 +76,7 @@ openEpub(int bookid) async {
     });
 
     VocsyEpub.open(
-      book_Url,
+      bookUrl,
       lastLocation: EpubLocator.fromJson({
         "bookId": book!.bookId,
         "href": book!.href,

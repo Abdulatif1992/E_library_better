@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_one_epub/models/category_from_sql.dart';
-import 'package:flutter_one_epub/utils/database_helper_category.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -13,10 +11,10 @@ import 'package:flutter_one_epub/detail_screen.dart';
 
 
 class CategoryScreen extends StatefulWidget {
-  const CategoryScreen({super.key, required this.cat_id, required this.cat_name});
+  const CategoryScreen({super.key, required this.catId, required this.catName});
 
-  final int cat_id;
-  final String cat_name;
+  final int catId;
+  final String catName;
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -38,17 +36,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return MaterialApp(
       home: Scaffold(
         body: Padding(
-          padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 16.0),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start, 
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _firstTitle(widget.cat_name),
+                _firstTitle(widget.catName),
 
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: bookList.map((book) => InkWell(
                       child: _allBooks(book),
@@ -69,19 +67,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
   // get bookList from sqflite
   Future<void> _getData() async {
     
-    bookList = await databaseHelper.getBookListCategoried(widget.cat_id);
+    bookList = await databaseHelper.getBookListCategoried(widget.catId);
     setState(() {
       bookList = bookList;     
     });
   }
 
-  Widget _firstTitle(String cat_name){
+  Widget _firstTitle(String catName){
     try {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.menu_book,
               color: Colors.blueGrey,
               size: 26.0,
@@ -89,7 +87,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 10.0),
               child: Text(
-                cat_name,
+                catName,
                 style: GoogleFonts.roboto(
                   fontSize: 22.0, fontWeight: FontWeight.bold, color: Colors.blueGrey
                 ),
@@ -100,10 +98,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
       );
     } on Exception catch (_) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.menu_book,
               color: Colors.black,
               size: 36.0,
@@ -127,10 +125,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
     try{
       return Container(
         //color: Colors.pink,
-        margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+        margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
         height: 150.0,
         decoration: BoxDecoration(
-          color: Color.fromARGB(50, 171, 207, 240),
+          color: const Color.fromARGB(50, 171, 207, 240),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -146,11 +144,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return Container(
         //color: Colors.pink,        
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 171, 207, 240),
+          color: const Color.fromARGB(255, 171, 207, 240),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          children: [
+          children: const [
             Text("Paka salom")
           ],
         ),
@@ -158,10 +156,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
   }
 
-    Widget _imgBase64(int book_id, String base64){
+    Widget _imgBase64(int bookId, String base64){
     try{
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 150,
         width: 120,
         child: ClipRRect(
@@ -176,7 +174,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
     on Exception catch (_) {
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 150,
         width: 120,
         child: ClipRRect(
@@ -194,13 +192,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Flexible(
       child: Container(
-        margin: EdgeInsets.only(top: 15.0),
+        margin: const EdgeInsets.only(top: 15.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
-            Container(width: screenWidth-200.0, height: 65.0 ,child: Text(book.book_title)),
+            Text(book.book_name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+            Container(width: screenWidth-200.0, height: 60.0 ,child: Text(book.book_title)),
             TextButton.icon(
               onPressed: () {
                   // Respond to button press
@@ -209,7 +207,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     MaterialPageRoute(builder: (context) => DetailScreen(book: book)),
                     );
               },
-              icon: Icon(Icons.file_open, size: 16),
+              icon: const Icon(Icons.file_open, size: 16),
               label: const Text("detail", style: TextStyle(fontSize: 18.0),),
             )
             
@@ -224,7 +222,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return Container(
       width: 30.0,
       height: 80.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
             border: Border(
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
@@ -232,8 +230,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          btype=="pdf"? Text(btype):Text(''),
-          Icon(Icons.done_all, color: Colors.green,),
+          btype=="pdf"? Text(btype):const Text(''),
+          const Icon(Icons.done_all, color: Colors.green,),
         ],
       ),
     );
@@ -242,7 +240,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return Container(
       width: 30.0,
       height: 80.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
             border: Border(
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
@@ -250,8 +248,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          btype=="pdf"? Text(btype):Text(''),
-          Icon(Icons.file_download, color: Colors.red,),
+          btype=="pdf"? Text(btype):const Text(''),
+          const Icon(Icons.file_download, color: Colors.red,),
         ],
       ),
     );

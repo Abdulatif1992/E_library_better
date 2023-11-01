@@ -14,7 +14,7 @@ class AuthenticationController extends GetxController{
 
   final box = GetStorage();
 
-  Future forgot_password({
+  Future forgotPassword({
     required String email,
   }) async {
     try{
@@ -48,23 +48,23 @@ class AuthenticationController extends GetxController{
       }
 
     }catch (e) {
-      print(e.toString());
+      //print(e.toString());
     }
   }
 
-  Future change_password({
+  Future changePassword({
     required String email,
     required String password,
-    required String password_confirmation,
-    required String security_number,
+    required String passwordConfirmation,
+    required String securityNumber,
   }) async {
     try{
       isLoading.value = true;
       var data = {
         'email': email,
         'password': password,
-        'password_confirmation': password_confirmation,
-        'security_number': security_number,
+        'password_confirmation': passwordConfirmation,
+        'security_number': securityNumber,
       };
 
       var response = await http.post(
@@ -93,7 +93,7 @@ class AuthenticationController extends GetxController{
       }
 
     } catch (e) {
-      print(e.toString());
+      //print(e.toString());
     }
   }
   
@@ -138,7 +138,7 @@ class AuthenticationController extends GetxController{
       }
 
     } catch (e) {
-      print(e.toString());
+      //print(e.toString());
     }
   }
 
@@ -161,8 +161,6 @@ class AuthenticationController extends GetxController{
         body: data,
       );
 
-      print(response.statusCode);
-      print(response.body);
       if(response.statusCode ==200){
         isLoading.value = false;
         token.value = json.decode(response.body)['token'];
@@ -182,7 +180,7 @@ class AuthenticationController extends GetxController{
 
     } catch (e) {
       isLoading.value = false;
-      print(e.toString());
+      //print(e.toString());
     }
   }
 }

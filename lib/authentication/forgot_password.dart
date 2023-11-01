@@ -30,7 +30,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Forgot password page', style: TextStyle(fontSize: 25.0),),
+                const Text('Forgot password page', style: TextStyle(fontSize: 25.0),),
                 const SizedBox(height: 30.0,),
                 InputWidget(hintText: 'Email', controller: _emailController, obscureText: false),
                 const SizedBox(height: 20.0,),
@@ -62,11 +62,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       elevation: 0,
                     ),
                     onPressed: () async {
-                      await _authenticationController.change_password(
+                      await _authenticationController.changePassword(
                         email: _emailController.text.trim(),
                         password: _newPasswordController.text.trim(),
-                        password_confirmation: _confirmPasswordController.text.trim(),
-                        security_number: _securityNumberController.text.trim(),
+                        passwordConfirmation: _confirmPasswordController.text.trim(),
+                        securityNumber: _securityNumberController.text.trim(),
                       );
                     }, 
                     child: Obx(() {
@@ -74,7 +74,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : Text('Change password', style: TextStyle(fontSize: 18),);
+                      : const Text('Change password', style: TextStyle(fontSize: 18),);
                     }),
                   ),
                 ),
@@ -89,7 +89,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       elevation: 0,
                     ),
                     onPressed: () async {
-                      await _authenticationController.forgot_password(
+                      await _authenticationController.forgotPassword(
                         email: _emailController.text.trim(),
                       );
                       await _checkSentEmail();
@@ -99,7 +99,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : Text('Send', style: TextStyle(fontSize: 18),);
+                      : const Text('Send', style: TextStyle(fontSize: 18),);
                     }),
                   ),
                 ),

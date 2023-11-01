@@ -9,7 +9,7 @@ import 'dart:convert';
 //it is for tuple function
 import 'package:tuple/tuple.dart';
 //it is for http
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 // it is for checking internet connection
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
@@ -18,8 +18,11 @@ import 'package:flutter_one_epub/models/book_from_sql.dart';
 import 'package:flutter_one_epub/utils/database_helper.dart';
 import 'package:flutter_one_epub/detail_screen.dart';
 import 'package:flutter_one_epub/epubreader_screen.dart';
-import 'package:flutter_one_epub/pdfreader_screen.dart';
 import 'package:flutter_one_epub/constants/constants.dart';
+
+import 'package:get/get.dart';
+
+
 
 
 
@@ -41,7 +44,7 @@ class _HomeScrennState extends State<HomeScrenn> {
 
   var _foundBook = List<BookFromSql>.empty();
 
-  bool isloading = false;
+  bool isloading = true;
  
   @override
   void initState(){
@@ -54,10 +57,11 @@ class _HomeScrennState extends State<HomeScrenn> {
     
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(      
+    return MaterialApp(   
+      title: "sasa",   
       home: Scaffold( 
         body: Padding(
-          padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 16.0),
           child: bookList.isEmpty 
           ? _listIsempty() 
           : 
@@ -67,14 +71,14 @@ class _HomeScrennState extends State<HomeScrenn> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _firstTitle(),
-
+      
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Container(
                     //color: Colors.pink,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(50, 171, 207, 240),
+                      color: const Color.fromARGB(50, 171, 207, 240),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -82,7 +86,7 @@ class _HomeScrennState extends State<HomeScrenn> {
                         onTap: () {
                           Navigator.push(
                             context, 
-                            MaterialPageRoute(builder: (context) => EpubReaderScreen(book_id: book.book_id)),
+                            MaterialPageRoute(builder: (context) => EpubReaderScreen(bookId: book.book_id)),
                           );
                         },
                         child: _myBooks(book.book_id, book.base64),
@@ -90,16 +94,16 @@ class _HomeScrennState extends State<HomeScrenn> {
                     ),
                   ),
                 ),
-
+      
                 _categoriesTitle(),
-
+      
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Container(
                     //color: Colors.pink,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(50, 171, 207, 240),
+                      color: const Color.fromARGB(50, 171, 207, 240),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -107,7 +111,7 @@ class _HomeScrennState extends State<HomeScrenn> {
                         onTap: () {
                           Navigator.push(
                             context, 
-                            MaterialPageRoute(builder: (context) => CategoryScreen(cat_id: category.id, cat_name: category.category_name)),
+                            MaterialPageRoute(builder: (context) => CategoryScreen(catId: category.id, catName: category.category_name)),
                           );
                         },                     
                         child: _myCategories(category.category_name),
@@ -115,10 +119,10 @@ class _HomeScrennState extends State<HomeScrenn> {
                     ),
                   ),
                 ),
-
+      
                 TextField(
                   onChanged: (value) => _runFilter(value),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Search', suffixIcon: Icon(Icons.search)
                   ),
                 ),
@@ -133,23 +137,16 @@ class _HomeScrennState extends State<HomeScrenn> {
                     elevation: 0,
                   ),
                   onPressed: () async {
-                    await checkInternet();
-                    AlertDialog alert = AlertDialog(
-                            title: Text("My title"),
-                            content: Text("This is my message."),
-                            actions: [
-                              okButton,
-                            ],
-                          );
+                    await checkInternet();                    
                     }, 
-                  child: Text('Refresh', style: TextStyle(fontSize: 18)),
+                  child: const Text('Refresh', style: TextStyle(fontSize: 18)),
                 ),                
-
+      
                 _titleFromInternet(),               
-
+      
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  physics: BouncingScrollPhysics(),
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: _foundBook.map((book) => InkWell(
                       child: _allBooks(book),
@@ -167,10 +164,10 @@ class _HomeScrennState extends State<HomeScrenn> {
   Widget _firstTitle(){
     try {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.menu_book,
               color: Colors.blueGrey,
               size: 26.0,
@@ -189,10 +186,10 @@ class _HomeScrennState extends State<HomeScrenn> {
       );
     } on Exception catch (_) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.menu_book,
               color: Colors.black,
               size: 36.0,
@@ -217,10 +214,10 @@ class _HomeScrennState extends State<HomeScrenn> {
   Widget _categoriesTitle(){
     try {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.article_outlined,
               color: Colors.blueGrey,
               size: 26.0,
@@ -239,10 +236,10 @@ class _HomeScrennState extends State<HomeScrenn> {
       );
     } on Exception catch (_) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
+        padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.menu_book,
               color: Colors.black,
               size: 36.0,
@@ -264,10 +261,10 @@ class _HomeScrennState extends State<HomeScrenn> {
     
   }
 
-  Widget _myBooks(int book_id, String base64){
+  Widget _myBooks(int bookId, String base64){
     try{
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 200,
         width: 160,
         child: ClipRRect(
@@ -281,9 +278,9 @@ class _HomeScrennState extends State<HomeScrenn> {
       );
     }
     on Exception catch (_) {
-      updateBook(book_id);
+      updateBook(bookId);
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 200,
         width: 160,
         child: ClipRRect(
@@ -297,19 +294,19 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
-  Widget _myCategories(String cat_name){    
+  Widget _myCategories(String catName){    
     return Container(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       height: 25.0,
       child: ClipRRect(        
           borderRadius: BorderRadius.circular(10.0),
           child: Container(
             //margin: EdgeInsets.all(2.0),
-            padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
+            padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
             color: Colors.lightBlue,
             child: Text(
-              '$cat_name',
-              style: TextStyle(
+              catName,
+              style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w600, // light
                 fontStyle: FontStyle.italic, // italic
@@ -322,10 +319,10 @@ class _HomeScrennState extends State<HomeScrenn> {
 
   Widget _titleFromInternet(){
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.file_download_sharp,
             color: Colors.blueGrey,
             size: 26.0,
@@ -348,10 +345,10 @@ class _HomeScrennState extends State<HomeScrenn> {
     try{
       return Container(
         //color: Colors.pink,
-        margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+        margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
         height: 150.0,
         decoration: BoxDecoration(
-          color: Color.fromARGB(50, 171, 207, 240),
+          color: const Color.fromARGB(50, 171, 207, 240),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -367,11 +364,11 @@ class _HomeScrennState extends State<HomeScrenn> {
       return Container(
         //color: Colors.pink,        
         decoration: BoxDecoration(
-          color: Color.fromARGB(255, 171, 207, 240),
+          color: const Color.fromARGB(255, 171, 207, 240),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          children: [
+          children: const [
             Text("Something is wrong")
           ],
         ),
@@ -379,10 +376,10 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
-  Widget _imgBase64(int book_id, String base64){
+  Widget _imgBase64(int bookId, String base64){
     try{
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 150,
         width: 120,
         child: ClipRRect(
@@ -396,9 +393,9 @@ class _HomeScrennState extends State<HomeScrenn> {
       );
     }
     on Exception catch (_) {
-      updateBook(book_id);
+      updateBook(bookId);
       return Container(
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         height: 150,
         width: 120,
         child: ClipRRect(
@@ -416,12 +413,12 @@ class _HomeScrennState extends State<HomeScrenn> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Flexible(
       child: Container(
-        margin: EdgeInsets.only(top: 15.0),
+        margin: const EdgeInsets.only(top: 15.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${book.book_name}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+            Text(book.book_name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
             Container(width: screenWidth-200.0, height: 60.0 ,child: Text(book.book_title)),
             TextButton.icon(
               onPressed: () {
@@ -431,7 +428,7 @@ class _HomeScrennState extends State<HomeScrenn> {
                     MaterialPageRoute(builder: (context) => DetailScreen(book: book)),
                     );
               },
-              icon: Icon(Icons.file_open, size: 16),
+              icon: const Icon(Icons.file_open, size: 16),
               label: const Text("detail", style: TextStyle(fontSize: 18.0),),
             )
             
@@ -446,7 +443,7 @@ class _HomeScrennState extends State<HomeScrenn> {
       return Container(
       width: 30.0,
       height: 80.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
             border: Border(
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
@@ -454,8 +451,8 @@ class _HomeScrennState extends State<HomeScrenn> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          btype=="pdf"? Text(btype):Text(''),
-          Icon(Icons.done_all, color: Colors.green,),
+          btype=="pdf"? Text(btype):const Text(''),
+          const Icon(Icons.done_all, color: Colors.green,),
         ],
       ),
     );
@@ -464,7 +461,7 @@ class _HomeScrennState extends State<HomeScrenn> {
       return Container(
       width: 30.0,
       height: 80.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
             border: Border(
               left: BorderSide(width: 1.5, color: Colors.grey),
             ),
@@ -472,8 +469,8 @@ class _HomeScrennState extends State<HomeScrenn> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          btype=="pdf"? Text(btype):Text(''),
-          Icon(Icons.file_download, color: Colors.red,),
+          btype=="pdf"? Text(btype):const Text(''),
+          const Icon(Icons.file_download, color: Colors.red,),
         ],
       ),
     );
@@ -495,7 +492,7 @@ class _HomeScrennState extends State<HomeScrenn> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   color: Colors.black,
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image:AssetImage("assets/img/restart2.jpg"), 
                     fit:BoxFit.cover
                   ), // button text
@@ -512,20 +509,14 @@ class _HomeScrennState extends State<HomeScrenn> {
         ),
         Visibility(
           visible: isloading,
-          child: Center(
-            child: const CircularProgressIndicator(
+          child: const Center(
+            child: CircularProgressIndicator(
                       color: Colors.blue,
                     ),
           )
           ),
       ],
     );
-  }
-
-  void _getCount() async {
-    int? result;
-    result = await databaseHelper.getCount();
-    print(result);
   }
 
   // get bookList from sqflite
@@ -543,30 +534,49 @@ class _HomeScrennState extends State<HomeScrenn> {
 
   Future<Tuple2<List?, String?>> getBooksId() async {
     try {
-      Response response = await post(
-              Uri.parse('${siteUrl}booksid'),
-              headers: {"Keep-Alive": "timeout=5, max=1"})
-          .timeout(const Duration(seconds: 5));
+      // Response response = await post(
+      //         Uri.parse('${siteUrl}booksid'),
+      //         headers: {"Keep-Alive": "timeout=5, max=1"})
+      //     .timeout(const Duration(seconds: 5));
       //print(response.statusCode);
+
+      var response = await http.post(
+      Uri.parse('${siteUrl}booksid'), 
+        headers: {
+          'Accept': 'application/json',
+          'Keep-Alive': 'timeout=5, max=1',
+        }
+      ).timeout(const Duration(seconds: 5));
+
+      //print(response.statusCode);
+
       if (response.statusCode == 200) {
         List booksId = jsonDecode(response.body) as List;        
         return Tuple2(booksId, null);
       } else {
-        return Tuple2(null, 'xatolik response');
+        return const Tuple2(null, 'Wrong status code, Please try again');
         
       }
     } catch (e) {
-      return Tuple2(null, 'xatolik try tuple');      
+      return const Tuple2(null, 'Error, Please try again');      
     }
   }
 
   Future<bool> getCategories(List catsId) async {
     try {
-      Response response = await post(
-              //Uri.http('uzfootball.000webhostapp.com', '/api/getcategories/$catsId'),
-              Uri.parse('${siteUrl}getcategories/$catsId'),
-              headers: {"Keep-Alive": "timeout=5, max=1"})
-          .timeout(const Duration(seconds: 5));
+      // Response response = await post(
+      //         Uri.parse('${siteUrl}getcategories/$catsId'),
+      //         headers: {"Keep-Alive": "timeout=5, max=1"})
+      //     .timeout(const Duration(seconds: 5));
+      
+      var response = await http.post(
+      Uri.parse('${siteUrl}getcategories/$catsId'), 
+        headers: {
+          'Accept': 'application/json',
+          'Keep-Alive': 'timeout=5, max=1',
+        }
+      ).timeout(const Duration(seconds: 5));
+
       //print(response.statusCode);
       if (response.statusCode == 200) {
         List<dynamic> categories = await jsonDecode(response.body);
@@ -590,8 +600,8 @@ class _HomeScrennState extends State<HomeScrenn> {
       for (var i = 0; i < oldCats.length; i++) {
         oldCatsId.add(oldCats[i].id);
       }      
-      bool getcategories = await getCategories(oldCatsId);      
-      var booksId = await getBooksId();      
+      bool getcategories = await getCategories(oldCatsId);  
+      var booksId = await getBooksId();     
       if (booksId.item2 == null) {
         List oldBooksId = [];
         List mainBooksId = [0];
@@ -606,19 +616,38 @@ class _HomeScrennState extends State<HomeScrenn> {
         }
         bool check = await getAllBooks(mainBooksId);
       } else {
-        print(booksId.item2);
+        Get.snackbar(
+            'Error',
+            '${booksId.item2}',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+        );
+        setState(() {
+          isloading = false;
+        });
+        //print(booksId.item2);
       }
-    } else {
-      setState(() {
-        isloading = false;
-      });
-      print("no Internet connection");      
+    } else {        
+      Get.snackbar(
+          'Error',
+          'No Internet connection',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+      );
+      Future.delayed(const Duration(seconds: 3)).then((_) {
+        setState(() {
+          isloading = false;
+        });
+      });             
     }
   }
 
+  
   // set up the button
   Widget okButton = TextButton(
-    child: Text("OK"),
+    child: const Text("OK"),
     onPressed: () { },
   );
 
@@ -644,13 +673,21 @@ class _HomeScrennState extends State<HomeScrenn> {
   //   }
   // }
 
-  Future<bool> getAllBooks(List books_id) async {
+  Future<bool> getAllBooks(List booksId) async {
     try {
-      Response response = await post(
-              //Uri.http('uzfootball.000webhostapp.com', '/api/getbooks/$books_id'),
-              Uri.parse('${siteUrl}getbooks/$books_id'),
-              headers: {"Keep-Alive": "timeout=5, max=1"})
-          .timeout(const Duration(seconds: 5));
+      // Response response = await post(
+      //         Uri.parse('${siteUrl}getbooks/$books_id'),
+      //         headers: {"Keep-Alive": "timeout=5, max=1"})
+      //     .timeout(const Duration(seconds: 5));
+      
+      var response = await http.post(
+      Uri.parse('${siteUrl}getbooks/$booksId'), 
+        headers: {
+          'Accept': 'application/json',
+          'Keep-Alive': 'timeout=5, max=1',
+        }
+      ).timeout(const Duration(seconds: 5));
+
       if (response.statusCode == 200) {        
         List<dynamic> books = await jsonDecode(response.body);        
         
@@ -668,13 +705,21 @@ class _HomeScrennState extends State<HomeScrenn> {
     }
   }
 
-  Future<void> updateBook(int book_id) async {
+  Future<void> updateBook(int bookId) async {
     try{
-      Response response = await post(
-              //Uri.http('uzfootball.000webhostapp.com', '/api/getbook/$book_id'),
-              Uri.parse('${siteUrl}getbook/$book_id'),
-              headers: {"Keep-Alive": "timeout=5, max=1"})
-          .timeout(const Duration(seconds: 5));
+      // Response response = await post(
+      //         Uri.parse('${siteUrl}getbook/$book_id'),
+      //         headers: {"Keep-Alive": "timeout=5, max=1"})
+      //     .timeout(const Duration(seconds: 5));
+
+      var response = await http.post(
+      Uri.parse('${siteUrl}getbook/$bookId'), 
+        headers: {
+          'Accept': 'application/json',
+          'Keep-Alive': 'timeout=5, max=1',
+        }
+      ).timeout(const Duration(seconds: 5));  
+
       if (response.statusCode == 200) {
         int timestamp = DateTime.now().millisecondsSinceEpoch;
         Map<String, dynamic> data = await jsonDecode(response.body);
@@ -683,16 +728,16 @@ class _HomeScrennState extends State<HomeScrenn> {
         await  _getData();
       } 
     }catch (e) {
-      print("xatolik");
+      //print("xatolik");
     }
 
   }
 
-  Future<void> updateTime(int book_id) async {
+  Future<void> updateTime(int bookId) async {
     DateTime now = DateTime.now();
     int timestamp = now.millisecondsSinceEpoch;
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    _getData();
+    await _getData();
 
   }
 

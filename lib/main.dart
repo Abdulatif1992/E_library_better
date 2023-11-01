@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_one_epub/authentication/login_page.dart';
 import 'package:flutter_one_epub/home_screen.dart';
 import 'package:get/get.dart';
 
@@ -15,6 +14,7 @@ class MyApp extends StatelessWidget {
     return const GetMaterialApp(
       home: HomeScrenn()
       //home: LoginPage()
+      //home: SnackBarDemo()
     );
   }
 }

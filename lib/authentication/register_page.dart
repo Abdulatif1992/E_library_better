@@ -29,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Register Page', style: TextStyle(fontSize: 25),),
+                const Text('Register Page', style: TextStyle(fontSize: 25),),
                 const SizedBox(height: 30.0,),
                 InputWidget(hintText: 'Name', controller: _nameController, obscureText: false),
                 const SizedBox(height: 20.0,),
@@ -60,7 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         color: Colors.white,
                       ),
                     )
-                    : Text('Register', style: TextStyle(fontSize: 18),);
+                    : const Text('Register', style: TextStyle(fontSize: 18),);
                   }),
                 ),
           
@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: () {
                     Get.to(() => const LoginPage());
                   }, 
-                  child: Text('Login', style: TextStyle(fontSize: 16),),
+                  child: const Text('Login', style: TextStyle(fontSize: 16),),
                 ),
               ],
             ),
